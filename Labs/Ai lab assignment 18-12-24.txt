@@ -1,0 +1,72 @@
+                               #!! Instrucrions !!!!
+#the code is combined for all questions and the uploaded code is with degree 2 if 
+#you want to fit the degree 16 just change the max_degree =16  on line 
+#here
+#r2_scores = fitPolynomial(xval, yval, max_degree=2) change the value then it will give 
+#you the best fit with R2
+
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
+from sklearn.preprocessing import PolynomialFeatures
+
+# Data
+xval = np.array([301.8267195898913, 206.48068590297993, 141.3506905750422, 181.45188429363267,
+                 41.78127527790235, 36.74157682849997, 49.77129275587662, -21.54843159015938,
+                 75.4361571381737, -3.8882674060444335, -9.46856287330992, -71.3194584463108,
+                 42.1215633120422, 49.088012341286515, 86.97664315575287, 66.69982327495062,
+                 122.96273379072505, 105.46219673639621, 139.43161572804308, 281.7900813768265,
+                 229.67424006279856])
+yval = np.array([-10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+
+# Function to plot data
+def plotData(xval, yval, title="Data Plot"):
+    plt.scatter(xval, yval, color='blue', label='Data Points')
+    plt.title(title)
+    plt.xlabel('x')
+    plt.ylabel('y')
+    plt.grid(True)
+    plt.legend()
+
+# Function to fit polynomial models of varying degrees
+def fitPolynomial(xval, yval, max_degree=16):
+    xval_reshaped = xval.reshape(-1, 1)  # Reshape xval for PolynomialFeatures
+    r2_scores = []
+    
+    # Iterate through degrees from 1 to max_degree
+    for degree in range(1, max_degree + 1):
+        # Transform data to include polynomial features
+        poly = PolynomialFeatures(degree)
+        xval_poly = poly.fit_transform(xval_reshaped)
+        
+        # Fit a linear regression model to the transformed data
+        model = LinearRegression()
+        model.fit(xval_poly, yval)
+        
+        # Predict using the trained model
+        y_pred = model.predict(xval_poly)
+        
+        # Calculate R^2 score
+        r2 = model.score(xval_poly, yval)
+        r2_scores.append(r2)
+        
+        # Plot the polynomial fit
+        plt.plot(np.sort(xval), model.predict(poly.transform(np.sort(xval).reshape(-1, 1))), label=f"Degree {degree} (R² = {r2:.3f})")
+    
+    return r2_scores
+
+# Plot the data
+plotData(xval, yval)
+
+# Fit polynomial models and plot them up to 16th degree just change the max_degree value for different degress
+r2_scores = fitPolynomial(xval, yval, max_degree=2)
+
+# Display R² for each degree
+for i, r2 in enumerate(r2_scores, start=1):
+    print(f"Degree {i} R²: {r2:.3f}")
+
+# Show the final plot with all polynomial fits
+plt.legend()
+plt.show()
+
